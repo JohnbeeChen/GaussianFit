@@ -1,4 +1,4 @@
-function [fitresult, gof] = GaussianFit2dCPU(fit_img)
+function [fit_result, gof] = GaussianFit2dCPU(fit_img)
 %GaussianFit2dCPU(X,Y,FIT_IMG)
 %  Create a fit.
 %
@@ -16,27 +16,44 @@ function [fitresult, gof] = GaussianFit2dCPU(fit_img)
 
 
 %% Fit: 'untitled fit 1'.
+% gray2photon_coefficent = 1;
 fit_img_size = size(fit_img);
 x = 1:fit_img_size(2);
 y = 1:fit_img_size(1);
 [X,Y] = meshgrid(x,y);
+X = X;
+Y = Y;
 [xData, yData, zData] = prepareSurfaceData( X, Y, fit_img );
 
 % Set up fittype and options.
-ft = fittype( 'z0 + amp*exp(-(x-x0).^2/(2*sigmax^2)-(y-y0).^2/(2*sigmay^2))', 'independent', {'x', 'y'}, 'dependent', 'z' );
+ft = fittype( 'z0 + amp*exp(-(x-x0).^2/(2*sigma^2)-(y-y0).^2/(2*sigma^2))', 'independent', {'x', 'y'}, 'dependent', 'z' );
 opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
 opts.Algorithm = 'Levenberg-Marquardt';
 opts.Display = 'Off';
 max_value = max(fit_img(:));
 min_value = min(fit_img(:));
 [y0,x0] = find(max_value == fit_img);
+x0 = x0;
+y0 = y0;
+% % opts.StartPoint = [amp_int sdx_int sdy_int x0_int y0_int min(z(:))];
+% opts.StartPoint = [max_value 1 1 x0(1) y0(1) min_value];
 
-% opts.StartPoint = [amp_int sdx_int sdy_int x0_int y0_int min(z(:))];
-opts.StartPoint = [max_value 1 1 x0 y0 min_value];
-
+% opts.StartPoint = [amp_int sd_int x0_int y0_int min(z(:))];
+opts.StartPoint = [max_value 1 x0(1) y0(1) min_value];
 % Fit model to data.
 
-[fitresult, gof] = fit( [xData, yData], zData, ft, opts );
+[fitresult, gof] = fit([xData, yData], zData, ft, opts);
+ft = fitresult;
+% tem = [ft.amp, ft.x0, ft.y0, ft.sigmax, ft.sigmay,ft.z0];  
+tem = [ft.amp, ft.x0, ft.y0, ft.sigma, ft.sigma,ft.z0];   
+fit_result = tem;
+fit_result(7) = gof.rmse;
+% gaussian_points = CreatGaussianData(fit_result,[length(x),length(y)]);
+% tem_error = fit_img - gaussian_points;
+% bg_noise = std(tem_error(:));
+% fit_result(7) = bg_noise;
+
+% photons_num = 2*pi*gray2photon_coefficent*ft.amp*ft.sigmax*ft.sigmay;
 
 % Plot fit with data.
 figure( 'Name', 'untitled fit 1' );
@@ -48,5 +65,6 @@ ylabel Y
 zlabel fit_img
 grid on
 view( 175.0, 14.0 );
+end
 
 

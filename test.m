@@ -1,3 +1,4 @@
+close all;
 z=[ 0	0	0	0	0	1	0	1	0	1	0	0	0
     0	0	0	1	1	0	0	0	0	1	1	0	0
     0	0	1	0	0	2	1	1	0	0	1	0	1
@@ -18,4 +19,9 @@ z=[ 0	0	0	0	0	1	0	1	0	1	0	0	0
     1	1	0	0	0	1	0	0	1	2	0	0	1
     0	1	1	0	0	0	0	1	1	0	0	0	2];
 fit_img = z;
-GaussianFit2dCPU(fit_img)
+% GaussianFit2dCPU(fit_img)
+[fitresult,~] = GaussianFit2dCPU(fit_img);
+[precise,gof] = Localization_Precise(fitresult,32.5);
+p = CreatGaussianData(fitresult,[13,19]);
+figure;
+surf(p);
