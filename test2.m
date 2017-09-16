@@ -7,7 +7,7 @@ addpath([cd '/GpuFit64']);
 addpath([cd '/common']);
 addpath([cd '/ReadROI']);
 
-pixe_size = 65;
+pixe_size = 32.5;
 gray2photon_coefficent = 1/(0.8*0.46);
 % gray2photon_coefficent = 30;
 
@@ -26,6 +26,8 @@ for ii = 1:img_num1
 end
 fit_img1 = fit_img1./img_num1;
 a = 1:2:25;
-fit_img1 = fit_img1(a,a);
+% fit_img1 = fit_img1(a,a);
 [fitresult1,~] = GaussianFit2dCPU(fit_img1);
-[precise1,gof1] = Localization_Precise(fitresult1,pixe_size);
+[precise1] = Localization_Precise(fitresult1,pixe_size);
+% p = CreatGaussianData(fitresult1,[25 25]);
+% tem = fit_img1 - p;

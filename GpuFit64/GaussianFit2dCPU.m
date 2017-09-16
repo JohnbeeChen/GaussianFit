@@ -21,8 +21,8 @@ fit_img_size = size(fit_img);
 x = 1:fit_img_size(2);
 y = 1:fit_img_size(1);
 [X,Y] = meshgrid(x,y);
-X = X;
-Y = Y;
+% X = X;
+% Y = Y;
 [xData, yData, zData] = prepareSurfaceData( X, Y, fit_img );
 
 % Set up fittype and options.
@@ -33,8 +33,8 @@ opts.Display = 'Off';
 max_value = max(fit_img(:));
 min_value = min(fit_img(:));
 [y0,x0] = find(max_value == fit_img);
-x0 = x0;
-y0 = y0;
+% x0 = x0;
+% y0 = y0;
 % % opts.StartPoint = [amp_int sdx_int sdy_int x0_int y0_int min(z(:))];
 % opts.StartPoint = [max_value 1 1 x0(1) y0(1) min_value];
 
@@ -45,9 +45,14 @@ opts.StartPoint = [max_value 1 x0(1) y0(1) min_value];
 [fitresult, gof] = fit([xData, yData], zData, ft, opts);
 ft = fitresult;
 % tem = [ft.amp, ft.x0, ft.y0, ft.sigmax, ft.sigmay,ft.z0];  
-tem = [ft.amp, ft.x0, ft.y0, ft.sigma, ft.sigma,ft.z0];   
+tem = [ft.amp, ft.x0, ft.y0, ft.sigma, ft.sigma,ft.z0];  
+p_mask = CreateGaussianMask(tem(2:3),tem(4:5),[max(x),max(y)]);
+tem1 = p_mask.*fit_img;
+tem2 = p_mask.^2;
+photon_num = sum(tem1(:))./sum(tem2(:));
 fit_result = tem;
 fit_result(7) = gof.rmse;
+fit_result(8) = photon_num;
 % gaussian_points = CreatGaussianData(fit_result,[length(x),length(y)]);
 % tem_error = fit_img - gaussian_points;
 % bg_noise = std(tem_error(:));
@@ -67,4 +72,16 @@ grid on
 view( 175.0, 14.0 );
 end
 
+function varargout = CreateGaussianMask(centerPoint,sigma,mask_size)
+%create a Gaussian Mask for estimating total photon number
+
+x = 1:mask_size(1);
+y = 1:mask_size(2);
+x0 = centerPoint(1);
+y0 = centerPoint(2);
+
+[X,Y] = meshgrid(x,y);
+p = exp(-(X-x0).^2/(2*sigma(1)^2)-(Y-y0).^2/(2*sigma(2)^2));
+varargout{1} = p;
+end
 

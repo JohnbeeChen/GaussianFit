@@ -31,7 +31,7 @@ for ii = 1:img_num1
 end
 fit_img1 = fit_img1./img_num1;
 [fitresult1,~] = GaussianFit2dCPU(fit_img1);
-[precise1,gof1] = Localization_Precise(fitresult1,pixe_size);
+[precise1] = Localization_Precise(fitresult1,pixe_size);
 
 img2 = img_set{2} - pixe_offset;
 img_num2 = size(img2,3);
@@ -42,17 +42,17 @@ for ii = 1:img_num2
 end
 fit_img2 = fit_img2./img_num2;
 [fitresult2,~] = GaussianFit2dCPU(fit_img2);
-[precise2,gof2] = Localization_Precise(fitresult2,32.5);
+[precise2] = Localization_Precise(fitresult2,pixe_size);
 
 size_img1  = size(img1);
 fit_img3 = fit_img1 - CreatGaussianData(fitresult2,[size_img1(2) size_img1(1)]);
 
 [fitresult3,~] = GaussianFit2dCPU(fit_img3);
-[precise3,gof3] = Localization_Precise(fitresult3,32.5);
-precitse = [precise1,gof1; precise2,gof2; precise3,gof3];
+[precise3] = Localization_Precise(fitresult3,pixe_size);
+precitse = [precise1; precise2; precise3];
 
 fit_result = [fitresult1; fitresult2; fitresult3];
-result = [fit_result(:,1:6),precitse(:,3:4),precitse(:,1:2)];
+result = [fit_result(:,1:8),precitse];
 
 
 figure;
