@@ -47,12 +47,15 @@ ft = fitresult;
 % tem = [ft.amp, ft.x0, ft.y0, ft.sigmax, ft.sigmay,ft.z0];  
 tem = [ft.amp, ft.x0, ft.y0, ft.sigma, ft.sigma,ft.z0];  
 p_mask = CreateGaussianMask(tem(2:3),tem(4:5),[max(x),max(y)]);
-tem1 = p_mask.*fit_img;
+tem1 = p_mask.*(fit_img - tem(6));
 tem2 = p_mask.^2;
 photon_num = sum(tem1(:))./sum(tem2(:));
+%notice: Gaussian masked method is to estimate the amplitude of the psf
+
 fit_result = tem;
 fit_result(7) = gof.rmse;%backgroud noise
 fit_result(8) = photon_num;
+% fit_result(8) = ft.amp*2*pi*ft.sigma.^2;
 % gaussian_points = CreatGaussianData(fit_result,[length(x),length(y)]);
 % tem_error = fit_img - gaussian_points;
 % bg_noise = std(tem_error(:));

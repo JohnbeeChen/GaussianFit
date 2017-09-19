@@ -1,5 +1,7 @@
 function varargout = CreatGaussianData(varargin)
-% notice: x direction means Column, and y direction means row
+% varargin{1} = [amp,x0,y0,sd_x,sd_y,z0];
+% varargin{2} = [data number in x direction, ...in y direction];
+% notice: in images, x direction means Column and y direction means row
 
 ft = varargin{1};
 img_size = varargin{2};
