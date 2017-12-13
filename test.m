@@ -20,8 +20,23 @@ z=[ 0	0	0	0	0	1	0	1	0	1	0	0	0
     0	1	1	0	0	0	0	1	1	0	0	0	2];
 fit_img = z;
 % GaussianFit2dCPU(fit_img)
-[fitresult,~] = GaussianFit2dCPU(fit_img);
-precise = Localization_Precise(fitresult,32.5);
-p = CreatGaussianData(fitresult,[13,19]);
-figure;
-surf(p);
+pixel_size = 65;
+[fitresult(1,:),precise(1,:)] = GaussianFit2dCPU(fit_img,pixel_size,1);
+
+% p = CreatGaussianData(fitresult,[13,19]);
+p = intersame(z);
+[fitresult(2,:),precise(2,:)] = GaussianFit2dCPU(p,pixel_size/2,1);
+% figure;
+% surf(p);
+
+function y = intersame(x)
+
+sz = 2*size(x);
+% y = zeros(sz);
+t1 = sz(2);
+tem(:,1:2:(t1-1)) = x;
+tem(:,2:2:t1) = x;
+t1 = sz(1);
+y(1:2:(t1-1),:) = tem;
+y(2:2:t1,:) = tem;
+end

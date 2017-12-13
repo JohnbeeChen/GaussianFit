@@ -3,7 +3,7 @@ function [fitresult,precision] = GaussianFit2dCPU(fit_img,pixel_size,varargin)
 % 2D Gaussian fitting and estimate the precision of the center of the Fit
 % @display_flag: 1 for display, 0 for no dsplay (default)
 % OutPut:
-%     fitresult = [amp,centroid_x0,centroid_y0,(standar deviation x, y),z0];
+%     fitresult = [amp,centroid_x0,centroid_y0,(standar deviation x, y),z0,rsquar];
 %     precision = [phton_number, background noise, pixle_size*(sd_x,sd_y),(precision_x,y)];
 % Author @Johnbee<Tianjiu@pku.edu.cn> 11/16/2017
 %}
@@ -45,14 +45,18 @@ sd = pk*ft.sigma;
 delta = CalculatePrecision(photon_number,backgraound,pk,sd);
 
 %% Output
-fitresult = [ft.amp,ft.x0,ft.y0,ft.sigma,ft.sigma,ft.z0];
+fitresult = [ft.amp,ft.x0,ft.y0,ft.sigma,ft.sigma,ft.z0,gof.rsquare];
 precision = [photon_number,backgraound,sd,sd,delta,delta];
 
+% if (gof.rsquare >= 0.8)&&(gof.rsquare < 0.9)
+%    display_flag = 1; 
+% end
 %% Plot fit with data.
 if display_flag == 1
 figure( 'Name', 'untitled fit 1' );
 h = plot( ft, [xData, yData], zData );
 legend( h, 'untitled fit 1', 'fit_img vs. X, Y', 'Location', 'NorthEast' );
+title(['Rsquare is',num2str(gof.rsquare)]);
 % Label axes
 xlabel X
 ylabel Y

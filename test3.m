@@ -1,80 +1,75 @@
-% suit for TRIF
-close all;
-clear;
-clc;
-addpath([cd '/data']);
-addpath([cd '/GpuFit64']);
-addpath([cd '/common']);
-addpath([cd '/ReadROI']);
+a = pixe_size*out1{3,1}(2:3);
+b = pixe_size*out2{3,1}(2:3);
+s = a- b;
+s = sqrt(s*s');
+result1 = out1{1,2};
+rsqure1 = out1{1,1}(:,7);
 
-a = 1:2:25;
-% a = 1:25;
-pixe_size = 65;
+result2 = out2{1,2};
+rsqure2 = out2{1,1}(:,7);
 
-% 1 photon = 0.82 electron, 1 electron = 2.2 intensity
-gray2photon_coefficent = 1/(0.82*2.2);
+% the threshold of Rsquare
+thres = 0.6;
+idx1 = rsqure1 >= thres;
+idx2 = rsqure2 >= thres;
 
+pre1 = result1(idx1,5);
+pre2 = result2(idx2,5);
+pre_sta(1,1) = mean(pre1);
+pre_sta(1,2) = std(pre1);
+pre_sta(2,1) = mean(pre2);
+pre_sta(2,2) = std(pre2);
+pn1 = result1(idx1,1);
+pn2 = result2(idx2,1);
 
-file_name = GetTiffFilePaths();
-img_set = ReadTiff(file_name);
-%convert intensity to photon number
-for ii = 1:3
-   img_set{ii} = gray2photon_coefficent*img_set{ii};  
-end
-offset_img = img_set{3};
-offset_img_size = size(offset_img);
-tem = offset_img_size(1)*offset_img_size(2)*offset_img_size(3);
-pixe_offset = sum(offset_img(:))/(tem);
+pre_sta(1,3) = mean(pn1);
+pre_sta(1,4) = std(pn1);
+pre_sta(2,3) = mean(pn2);
+pre_sta(2,4) = std(pn2);
 
-img1 = img_set{1} - pixe_offset;
+loc1 = pixe_size*out1{1,1}(idx1,2:3);
+loc2 = pixe_size*out2{1,1}(idx2,2:3);
 
-img_num1 = size(img1,3);
-fit_img1 = zeros(size(img1(:,:,1)));
+s1 = loc1 - a;
+s1 = s1.^2;
+s1 = sqrt(sum(s1,2));
 
-for ii = 1:img_num1
-   fit_img1 = fit_img1 + img1(:,:,ii); 
-end
-% fit_img1 = fit_img1./img_num1;
-fit_img1 = fit_img1(a,a);
-[fitresult1,~] = GaussianFit2dCPU(fit_img1);
-[precise1] = Localization_Precise(fitresult1,pixe_size);
+s2 = loc2 - b;
+s2 = s2.^2;
+s2 = sqrt(sum(s2,2));
 
-img2 = img_set{2} - pixe_offset;
-img_num2 = size(img2,3);
-fit_img2 = zeros(size(img2(:,:,1)));
+mean(s1)
+std(s1)
+mean(s2)
+std(s2)
 
-for ii = 1:img_num2
-   fit_img2 = fit_img2 + img2(:,:,ii); 
-end
-% fit_img2 = fit_img2./img_num2;
-fit_img2 = fit_img2(a,a);
-[fitresult2,~] = GaussianFit2dCPU(fit_img2);
-[precise2] = Localization_Precise(fitresult2,pixe_size);
+% tem1 = loc1*loc1';
+% tem1 = sqrt( diag(tem1));
+tem1 = loc1;
+std1 = std(tem1,0,1);
+radiu1 = sqrt(std1*std1');
 
-[fitresult_tem,~] = GaussianFit2dCPU(fit_img2./img_num2);
+tem1 = loc2;
+% tem1 = sqrt( diag(tem1));
+std1 = std(tem1,0,1);
+radiu2 = sqrt(std1*std1');
 
-size_img1  = size(fit_img1);
-% p = CreatGaussianData(fitresult_tem,[size_img1(2) size_img1(1)]);
-% for ii = 1:img_num1
-%    img3(:,:,ii) = img1(:,:,ii) - p; 
-% end
-
-fit_img3 = fit_img1 - img_num1.*CreatGaussianData(fitresult_tem,[size_img1(2) size_img1(1)]);
-[fitresult3,~] = GaussianFit2dCPU(fit_img3);
-[precise3] = Localization_Precise(fitresult3,pixe_size);
-precitse = [precise1; precise2; precise3];
-
-fit_result = [fitresult1; fitresult2; fitresult3];
-result = [fit_result(:,1:8),precitse];
+figure
+plot(a(1),a(2),'bx','MarkerSize',14);
+hold on
+circle(a,radiu1,'b');
+hold on
+plot(loc1(:,1),loc1(:,2),'b*');
 
 
-figure;
-subplot(1,3,1);
-surf(fit_img1);
-% axis equal;
-subplot(1,3,2);
-surf(fit_img2);
-% axis equal;
-subplot(1,3,3);
-surf(fit_img3);
-% axis equal;
+
+hold on
+plot(b(1),b(2),'rx','MarkerSize',14);
+hold on
+circle(b,radiu2,'r');
+hold on
+plot(loc2(:,1),loc2(:,2),'r*');
+grid minor
+
+s_title = ['red radius: ',num2str(radiu2),';blue radius: ',num2str(radiu1)];
+title(s_title);

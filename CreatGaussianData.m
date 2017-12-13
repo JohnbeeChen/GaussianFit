@@ -5,13 +5,31 @@ function varargout = CreatGaussianData(varargin)
 
 ft = varargin{1};
 img_size = varargin{2};
+img = zeros(img_size);
 
-x = 1:img_size(1);
-y = 1:img_size(2);
+x = 0.1:0.1:img_size(1);
+y = 0.1:0.1:img_size(2);
 
 [X,Y] = meshgrid(x,y);
 p = ft(1)*exp(-(X-ft(2)).^2/(2*ft(4)^2)-(Y-ft(3)).^2/(2*ft(5)^2)) +ft(6);
-varargout{1} = p;
-% surf(p)
-% xlabel('x');
-% ylabel('y');
+for ii = 1:img_size(1)
+    idx = ((ii-1)*10+1) : (ii*10);
+   for jj =1:img_size(2) 
+       idy = ((jj-1)*10+1) : (jj*10);
+       tem = p(idx,idy);
+       img(ii,jj) = sum(tem(:))./100;
+   end
+end
+varargout{1} = img;
+
+
+
+% ft = varargin{1};
+% img_size = varargin{2};
+% 
+% x = 1:img_size(1);
+% y = 1:img_size(2);
+% 
+% [X,Y] = meshgrid(x,y);
+% p = ft(1)*exp(-(X-ft(2)).^2/(2*ft(4)^2)-(Y-ft(3)).^2/(2*ft(5)^2)) +ft(6);
+% varargout{1} = p;
