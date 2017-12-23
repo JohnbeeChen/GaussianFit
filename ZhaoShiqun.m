@@ -9,16 +9,21 @@ addpath([cd '/ReadROI']);
 
 %% some parameters can be setted
 % @TIRF_falg = 1 means that the input imgaes are from TIRF with interpolation
-TIRF_flag = 1;
+TIRF_flag = 0;
 
 % @displya_flag = 1 for plot the fitting result, 0 for not
 display_flag = 1;
 
 % @pixle_size means the 
-pixle_size = 65;
+pixle_size = 87;
 
-% 1 photon = 0.82 electron, 1 electron = 2.2 intensity
-gray2photon_coefficent = 1/(0.82*2.2);
+% parameters of the camere, sets according to the real device
+ADU = 11.86;
+QE = 0.95;
+EMgain = 2000;
+
+%% the code followed not allow modification
+gray2photon_coefficent = ADU/(QE*EMgain);
 
 %% reads the last time opened file's path
 if exist('lastfile.mat','file')
@@ -55,8 +60,15 @@ for ii = 1:imag_statck_num
        tem = tem(idx_row,idx_col);
     end
     img_set_sum{ii} = tem;
-    [ftresult(ii,:),precise(ii,:)] = GaussianFit2dCPU(tem,pixle_size,display_flag);
-    
+    [ftresult(ii,:),precise(ii,:)] = GaussianFit2dCPU(tem,pixle_size,display_flag);    
 end
+ft_column_name = {'Amp','x0','y0','sigma_x','sigma_y','z0','Rsquar'};
+pre_column_name = {'phton number', 'background noise','width_x','width_y','delta_x','delta_y'};
+
+str = [pathname 'fit_info.xls'];
+SaveExcel(str,ftresult,ft_column_name);
+str = [pathname 'precision_info.xls'];
+SaveExcel(str,precise,pre_column_name);
+
 disp('finished!');
 save('lastfile.mat','pathname','filename');
