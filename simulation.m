@@ -13,11 +13,11 @@ addpath([cd '/Johnbee']);
 % sd = sigma/pixel_size 
 % img_size = [25,25];
 
-total_photon = 200;
+total_photon = 2000;
 pixel_size = 65;
-psf_fwhm = 230;% fwhm = 2.355*sigma in Gaussian distribution
-bg_offset = 55; % bg means background
-bg_noise = 1;% @bg_noise means the standard deviation of Gaussian noise
+psf_fwhm = 250;% fwhm = 2.355*sigma in Gaussian distribution
+bg_offset = 100; % bg means background
+bg_noise = 5;% @bg_noise means the standard deviation of Gaussian noise
 sigma = psf_fwhm/2.355;
 sd = sigma/pixel_size;
 img_size = [25,25];
@@ -28,8 +28,16 @@ z0 = 0;
 sdx = sd;
 sdy = sd;
 display_flag = 0;
+% 1 photon = 0.82 electron, 1 electron = 2.2 intensity
+% gray2photon_coefficent = 1/(0.82*2.2);
+gray2photon_coefficent = 1;
 
 for ii = 1:100
+if ii == 1
+   display_flag = 1;
+else
+    display_flag = 0;
+end
 total_photon = poissrnd(total_photon);%simultates the poisson noise
 amp = total_photon./(2*pi*sd.^2);
 ft = [amp,x0,y0,sdx,sdy,z0];
@@ -42,6 +50,10 @@ simu_img(:,:,ii) = p;
 % figure;
 % surf(p);
 [ft_result(ii,:),precision(ii,:)] = GaussianFit2dCPU(p,pixel_size,display_flag);
+if display_flag
+   title('gaaghg'); 
+end
+t  = 1;
 end
 
 pathname = 'simudata.tif';
