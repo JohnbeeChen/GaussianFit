@@ -65,7 +65,7 @@ end
 [fitresult3,precise3] = GaussianFit2dCPU(fit_img3,pixe_size,display_flag);
 
 
-%fitresult = [amp,centroid_x0,centroid_y0,(standar deviation x, y),z0];
+%fitresult = [amp,centroid_x0,centroid_y0,(standar deviation x, y),z0,Rsqure];
 %precision = [phton_number, background noise, pixle_size*(sd_x,sd_y),(precision_x,y)];
 fitresult = [fitresult2;fitresult3];
 precise = [precise2; precise3];
