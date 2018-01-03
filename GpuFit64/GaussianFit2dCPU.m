@@ -22,9 +22,10 @@ y = 1:fit_img_size(1);
 %% Set up fittype and options.
 ft = fittype( 'z0 + amp*exp(-(x-x0).^2/(2*sigma^2)-(y-y0).^2/(2*sigma^2))', 'independent', {'x', 'y'}, 'dependent', 'z' );
 opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
+% opts = fitoptions( 'Method', 'Trust-Region' );
 opts.Algorithm = 'Levenberg-Marquardt';
 opts.Display = 'Off';
-
+% opts.Lower = [0 0 0 0 0];
 % [centroid,amp_int] = FindCentroid(fit_img);
 
 amp_int = max(fit_img(:));

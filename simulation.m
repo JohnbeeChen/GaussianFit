@@ -13,11 +13,11 @@ addpath([cd '/Johnbee']);
 % sd = sigma/pixel_size 
 % img_size = [25,25];
 
-total_photon = 2000;
+total_photon = 10000;
 pixel_size = 65;
 psf_fwhm = 250;% fwhm = 2.355*sigma in Gaussian distribution
 bg_offset = 100; % bg means background
-bg_noise = 5;% @bg_noise means the standard deviation of Gaussian noise
+bg_noise = 10;% @bg_noise means the standard deviation of Gaussian noise
 sigma = psf_fwhm/2.355;
 sd = sigma/pixel_size;
 img_size = [25,25];
@@ -56,8 +56,8 @@ end
 t  = 1;
 end
 
-pathname = 'simudata.tif';
-immultifwrite(pathname,simu_img,16);
+% pathname = 'simudata.tif';
+% immultifwrite(pathname,simu_img,16);
 % the threshold of Rsquare
 thres = 0.5;
 rsqure = ft_result(:,7);

@@ -11,7 +11,7 @@ x = 0.1:0.1:img_size(1);
 y = 0.1:0.1:img_size(2);
 
 [X,Y] = meshgrid(x,y);
-p = ft(1)*exp(-(X-ft(2)).^2/(2*ft(4)^2)-(Y-ft(3)).^2/(2*ft(5)^2)) +ft(6);
+p = ft(1)*exp(-(X-ft(2)).^2/(2*ft(4)^2)-(Y-ft(3)).^2/(2*ft(5)^2)) + ft(6);
 for ii = 1:img_size(1)
     idx = ((ii-1)*10+1) : (ii*10);
    for jj =1:img_size(2) 
