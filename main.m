@@ -1,6 +1,7 @@
 close all;
 clear;
 clc;
+addpath(cd);
 addpath([cd '/data']);
 addpath([cd '/GpuFit64']);
 addpath([cd '/common']);

@@ -1,4 +1,4 @@
-function [fitresult,precision] = GaussianFit2dCPU(fit_img,pixel_size,varargin)
+function [fitresult,precision] = GaussianFit2Mole(fit_img,mole2ft,pixel_size,varargin)
 %{ GaussianFit2dCPU(fit_img,pixel_size,display_flag)
 % 2D Gaussian fitting and estimate the precision of the center of the Fit
 % @display_flag: 1 for display, 0 for no dsplay (default)
@@ -7,12 +7,17 @@ function [fitresult,precision] = GaussianFit2dCPU(fit_img,pixel_size,varargin)
 %     precision = [phton_number, background noise, pixle_size*(sd_x,sd_y),(precision_x,y)];
 % Author @Johnbee<Tianjiu@pku.edu.cn> 11/16/2017
 %}
+Ac = mole2ft(1);
+xc = mole2ft(2);
+yc = mole2ft(3);
+sc = mole2ft(4);
+
 
 display_flag = 0;
-if nargin >= 3
+if nargin >= 4
     display_flag = varargin{1};
 end
-if nargin == 4
+if nargin == 5
     file_name = varargin{2};
 end
 fit_img_size = size(fit_img);
@@ -22,9 +27,14 @@ y = 1:fit_img_size(1);
 [xData, yData, zData] = prepareSurfaceData( X, Y, fit_img );
 
 %% Set up fittype and options.
+formula_part2 = '-A1*exp(-(x-x0).^2/(2*sigma^2)-(y-y0).^2/(2*sigma^2))';
+formula_part2 = replace(formula_part2,'x0',num2str(xc));
+formula_part2 = replace(formula_part2,'y0',num2str(yc));
+formula_part2 = replace(formula_part2,'sigma',num2str(sc));
+
 formula = 'z0 + amp*exp(-(x-x0).^2/(2*sigma^2)-(y-y0).^2/(2*sigma^2))';
 % ft = fittype( 'z0 + amp*exp(-(x-x0).^2/(2*sigma^2)-(y-y0).^2/(2*sigma^2))', 'independent', {'x', 'y'}, 'dependent', 'z' );
-ft = fittype(formula, 'independent', {'x', 'y'}, 'dependent', 'z' );
+ft = fittype([formula,formula_part2], 'independent', {'x', 'y'}, 'dependent', 'z' );
 
 opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
 % opts = fitoptions( 'Method', 'Trust-Region' );
@@ -38,7 +48,7 @@ min_value = min(fit_img(:));
 [y0,x0] = find(fit_img == amp_int);
 
 % opts.StartPoint = [amp_int sd_int x0_int y0_int min(z(:))];
-opts.StartPoint = [amp_int 1 x0(1) y0(1) min_value];
+opts.StartPoint = [amp_int 1 x0(1) y0(1) min_value Ac];
 
 % Fit model to data.
 [ft, gof] = fit([xData, yData], zData, ft, opts);
@@ -51,7 +61,7 @@ sd = pk*ft.sigma;
 delta = CalculatePrecision(photon_number,backgraound,pk,sd);
 
 %% Output
-fitresult = [ft.amp,ft.x0,ft.y0,ft.sigma,ft.sigma,ft.z0,gof.rsquare];
+fitresult = [ft.amp,ft.x0,ft.y0,ft.sigma,ft.sigma,ft.z0,ft.A1,gof.rsquare];
 precision = [photon_number,backgraound,sd,sd,delta,delta];
 
 % if (gof.rsquare >= 0.8)&&(gof.rsquare < 0.9)
@@ -62,7 +72,7 @@ if display_flag == 1
     figure( 'Name', 'untitled fit 1' );
     h = plot( ft, [xData, yData], zData );
     legend( h, 'untitled fit 1', 'fit_img vs. X, Y', 'Location', 'NorthEast' );
-    if nargin >= 4
+    if nargin >= 5
         til_str = file_name;
         title([til_str,',Rsquare is',num2str(gof.rsquare)]);
     else       

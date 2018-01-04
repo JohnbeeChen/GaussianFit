@@ -19,15 +19,19 @@ z=[ 0	0	0	0	0	1	0	1	0	1	0	0	0
     1	1	0	0	0	1	0	0	1	2	0	0	1
     0	1	1	0	0	0	0	1	1	0	0	0	2];
 fit_img = z;
-% GaussianFit2dCPU(fit_img)
+sz = size(fit_img);
 pixel_size = 65;
-[fitresult(1,:),precise(1,:)] = GaussianFit2dCPU(fit_img,pixel_size,1);
+[ft,pre] = GaussianFit2dCPU(fit_img,pixel_size,1);
+gaudata = CreatGaussianData(ft,sz);
+psfdata = CreatePSF(ft,sz);
 
-% p = CreatGaussianData(fitresult,[13,19]);
-p = intersame(z);
-[fitresult(2,:),precise(2,:)] = GaussianFit2dCPU(p,pixel_size/2,1);
-% figure;
-% surf(p);
+figure;
+surf(gaudata);
+title('gaudata');
+
+figure;
+surf(psfdata);
+title('psfdata');
 
 function y = intersame(x)
 
