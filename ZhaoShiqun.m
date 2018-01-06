@@ -7,12 +7,12 @@ addpath([cd '/GpuFit64']);
 addpath([cd '/common']);
 addpath([cd '/ReadROI']);
 
-%% some parameters can be setted
+%% some parameters can be set
 % @TIRF_falg = 1 means that the input imgaes are from TIRF with interpolation
 TIRF_flag = 0;
 
 % @displya_flag = 1 for plot the fitting result, 0 for not
-display_flag = 1;
+display_flag = 0;
 
 % @pixle_size means the 
 pixle_size = 87;
@@ -62,7 +62,7 @@ for ii = 1:imag_statck_num
     img_set_sum{ii} = tem;
     [ftresult(ii,:),precise(ii,:)] = GaussianFit2dCPU(tem,pixle_size,display_flag);    
 end
-ft_column_name = {'Amp','x0','y0','sigma_x','sigma_y','z0','Rsquar'};
+ft_column_name = {'Amp','x0','y0','sigma_x','sigma_y','z0','Rsquare'};
 pre_column_name = {'phton number', 'background noise','width_x','width_y','delta_x','delta_y'};
 
 str = [pathname 'fit_info.xls'];

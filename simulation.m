@@ -13,9 +13,9 @@ addpath([cd '/Johnbee']);
 % sd = sigma/pixel_size 
 % img_size = [25,25];
 
-total_photon = 10000;
-pixel_size = 65;
-psf_fwhm = 250;% fwhm = 2.355*sigma in Gaussian distribution
+total_photon = 1000;
+pixel_size = 32.5;
+psf_fwhm = 90;% fwhm = 2.355*sigma in Gaussian distribution
 bg_offset = 100; % bg means background
 bg_noise = 10;% @bg_noise means the standard deviation of Gaussian noise
 sigma = psf_fwhm/2.355;
@@ -59,7 +59,7 @@ end
 % pathname = 'simudata.tif';
 % immultifwrite(pathname,simu_img,16);
 % the threshold of Rsquare
-thres = 0.5;
+thres = 0;
 rsqure = ft_result(:,7);
 idx1 = rsqure >= thres;
 
@@ -69,11 +69,17 @@ tem = good_result(:,2:3);
 std_xy = std(tem,0,1);
 radiu = pixel_size*sqrt(std_xy*std_xy');
 figure;
-% cen = pixel_size*([x0,y0] +0.4);
+
 cen = pixel_size*mean(tem);
-plot(cen(1),cen(2),'Kx','MarkerSize',14);
-circle(cen,radiu);
-hold on
+cen_c = pixel_size*[x0,y0];
+dis = cen-cen_c;
+distance = sqrt(dis*dis');
 plot(pixel_size*tem(:,1),pixel_size*tem(:,2),'r*');
+hold on
+plot(cen(1),cen(2),'rx','MarkerSize',16);
+circle(cen,radiu,'r');
+hold on
+plot(cen_c(1),cen_c(2),'kx','MarkerSize',16);
 mean_precision = mean(precision(:,6));
-title(['radius is ',num2str(radiu),';precision is ',num2str(mean_precision)]);
+title(['distance:',num2str(distance),' radius:',num2str(radiu),' precision:',num2str(mean_precision)]);
+grid minor

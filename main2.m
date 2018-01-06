@@ -16,8 +16,8 @@ pixel_size = 32.5;%for SIM and TIRF with interpolation
 % pixe_s5ize = 65;%for TIRF without interpolation
 
 % 1 photon = 0.82 electron, 1 electron = 2.2 intensity
-gray2photon = 1/(0.82*2.2);
-
+% gray2photon = 1/(0.82*2.2);
+gray2photon = 1;
 if exist('lastpath.mat','file')
     start_path = importdata('lastpath.mat');
 else
@@ -66,7 +66,7 @@ while ii>0
             ft(6) = 0; % set the offset @ft(6) to 0 for creating a perfect Gassian distribution without offset
             p = CreatGaussianData(ft,img_size);
 %             p = CreatePSF(ft,img_size);
-            tem = 0.6*stac_img_num(ii)./stac_img_num(jj);
+            tem = 1*stac_img_num(ii)./stac_img_num(jj);
             fit_img = fit_img - tem*p;
         end      
         figure
