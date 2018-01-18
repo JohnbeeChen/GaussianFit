@@ -6,24 +6,26 @@ addpath([cd '/GpuFit64']);
 addpath([cd '/Johnbee']);
 addpath([cd '/common']);
 
-display = 0;
-a = 32.5;
-sz = [15,15];
-mole1_loc = [7,7];
-mole2_loc = [7,7.1];
-width = 90;
-bg_noise = 5;
-bg_offset = 5;
+display = 1;
+a = 65;
+sz = [25,25];
+mole1_loc = [13,13];
+mole2_loc = [13.1,13.1];
+width = 355;
+bg_noise = 244;
+bg_offset = 1500;
 
 sigma = width/(2.355*a);
-N1_constn = 150;
-N2_constn = 140;
+N1_constn = 109000;
+N2_constn = 69000;
 
-N1 = 150/(2*pi*sigma^2);
-N2 = 140/(2*pi*sigma^2);
+N1 = N1_constn/(2*pi*sigma^2);
+N2 = N2_constn/(2*pi*sigma^2);
 
+num1 = 1;
+num2 = 1;
+num3 = 1;
 for ite = 1:100
-num1 = 40;
 for ii = 1:num1
     amp1 = poissrnd(N1_constn)/(2*pi*sigma^2);
     amp2 = poissrnd(N2_constn)/(2*pi*sigma^2);
@@ -34,7 +36,6 @@ for ii = 1:num1
     noise = normrnd(bg_offset,bg_noise,sz);
     img1(:,:,ii) = bi_data+noise;
 end
-num2 = 30;
 for ii = 1:num2
     amp2 = poissrnd(N2_constn)/(2*pi*sigma^2);
     ft2 = [amp2,mole2_loc,sigma,sigma,0];
@@ -42,8 +43,6 @@ for ii = 1:num2
     noise = normrnd(bg_offset,bg_noise,sz);
     img2(:,:,ii) = mole2_data+noise;
 end
-
-num3 = 30;
 for ii = 1:num3
     noise = normrnd(bg_offset,bg_noise,sz);
     img3(:,:,ii) = noise;
@@ -67,15 +66,15 @@ delta_xy = tem_ft(1,2:3)-tem_ft(2,2:3);
 tem(ite) = a*sqrt(delta_xy*delta_xy');
 % disp(['delata loc:',num2str(tem)]);
 end
-mean(tem)
-std(tem)
-histogram(tem);
-photon = pre(:,1);
-photon1 = photon(1:2:end);
-photon2 = photon(2:2:end);
-precision = pre(:,5);
-precision1 = precision(1:2:end);
-precision2 = precision(2:2:end);
+% mean(tem)
+% std(tem)
+% histogram(tem);
+% photon = pre(:,1);
+% photon1 = photon(1:2:end);
+% photon2 = photon(2:2:end);
+% precision = pre(:,5);
+% precision1 = precision(1:2:end);
+% precision2 = precision(2:2:end);
 
 function varargout = MultiStepFit(imgMultiStep,gray2Photon,pixelSize,dispFlag)
 %% this function suit for multi-step image stack

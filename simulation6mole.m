@@ -9,10 +9,15 @@ addpath([cd '/common']);
 display = 0;
 a = 32.5;
 sz = [15,15];
-mole1_loc = [7,7];
-mole2_loc = [7,7.1];
-mole3_loc = [7.1,7.1];
-mole4_loc = [7.1,7];
+oring = [7,7];
+k = 0.1;
+mole1_loc = oring + k*[0,0];
+mole2_loc = oring + k*[1,0];
+mole3_loc = oring + k*[1.5,sqrt(3)/2];
+mole4_loc = oring + k*[1,sqrt(3)];
+mole5_loc = oring + k*[0,sqrt(3)];
+mole6_loc = oring + k*[-0.5,sqrt(3)/2];
+
 width = 90;
 bg_noise = 5;
 bg_offset = 5;
@@ -22,19 +27,60 @@ N1_constn = 1000;
 N2_constn = 1000;
 N3_constn = 1000;
 N4_constn = 1000;
+N5_constn = 1000;
+N6_constn = 1000;
 
 N1 = N1_constn/(2*pi*sigma^2);
 N2 = N2_constn/(2*pi*sigma^2);
 N3 = N3_constn/(2*pi*sigma^2);
 N4 = N4_constn/(2*pi*sigma^2);
-num1 = 30;
-num2 = 30;
-num3 = 30;
-num4 = 30;
-num5 = 30;
-for ite = 1:100
-    
+N5 = N5_constn/(2*pi*sigma^2);
+N6 = N6_constn/(2*pi*sigma^2);
+
+num1 = 100;
+num2 = 100;
+num3 = 100;
+num4 = 100;
+num5 = 100;
+num6 = 100;
+num7 = 30;
+for ite = 1:50
     for ii = 1:num1
+        amp1 = poissrnd(N1_constn)/(2*pi*sigma^2);
+        amp2 = poissrnd(N2_constn)/(2*pi*sigma^2);
+        amp3 = poissrnd(N3_constn)/(2*pi*sigma^2);
+        amp4 = poissrnd(N4_constn)/(2*pi*sigma^2);
+        amp5 = poissrnd(N5_constn)/(2*pi*sigma^2);
+        amp6 = poissrnd(N6_constn)/(2*pi*sigma^2);
+        ft1 = [amp1,mole1_loc,sigma,sigma,0];
+        ft2 = [amp2,mole2_loc,sigma,sigma,0];
+        ft3 = [amp3,mole3_loc,sigma,sigma,0];
+        ft4 = [amp4,mole4_loc,sigma,sigma,0];
+        ft5 = [amp6,mole5_loc,sigma,sigma,0];
+        ft6 = [amp6,mole6_loc,sigma,sigma,0];
+        six_data = CreatGaussianData(ft1,sz) + CreatGaussianData(ft2,sz) ...
+            + CreatGaussianData(ft3,sz)+ CreatGaussianData(ft4,sz)...
+            + CreatGaussianData(ft5,sz)+ CreatGaussianData(ft6,sz);
+        noise = normrnd(bg_offset,bg_noise,sz);
+        img1(:,:,ii) = six_data+noise;
+    end
+    for ii = 1:num2
+        amp1 = poissrnd(N1_constn)/(2*pi*sigma^2);
+        amp2 = poissrnd(N2_constn)/(2*pi*sigma^2);
+        amp3 = poissrnd(N3_constn)/(2*pi*sigma^2);
+        amp4 = poissrnd(N4_constn)/(2*pi*sigma^2);
+        amp5 = poissrnd(N5_constn)/(2*pi*sigma^2);
+        ft1 = [amp1,mole1_loc,sigma,sigma,0];
+        ft2 = [amp2,mole2_loc,sigma,sigma,0];
+        ft3 = [amp3,mole3_loc,sigma,sigma,0];
+        ft4 = [amp4,mole4_loc,sigma,sigma,0];
+        ft5 = [amp5,mole5_loc,sigma,sigma,0];
+        five_data = CreatGaussianData(ft1,sz) + CreatGaussianData(ft2,sz) ...
+            + CreatGaussianData(ft3,sz)+ CreatGaussianData(ft4,sz) + CreatGaussianData(ft5,sz);
+        noise = normrnd(bg_offset,bg_noise,sz);
+        img2(:,:,ii) = five_data+noise;
+    end
+    for ii = 1:num3
         amp1 = poissrnd(N1_constn)/(2*pi*sigma^2);
         amp2 = poissrnd(N2_constn)/(2*pi*sigma^2);
         amp3 = poissrnd(N3_constn)/(2*pi*sigma^2);
@@ -48,56 +94,58 @@ for ite = 1:100
         qua_data = CreatGaussianData(ft1,sz) + CreatGaussianData(ft2,sz) ...
             + CreatGaussianData(ft3,sz)+ CreatGaussianData(ft4,sz);
         noise = normrnd(bg_offset,bg_noise,sz);
-        img1(:,:,ii) = qua_data+noise;
-    end
-    
-    for ii = 1:num2
-        amp2 = poissrnd(N2_constn)/(2*pi*sigma^2);
-        amp3 = poissrnd(N3_constn)/(2*pi*sigma^2);
-        amp4 = poissrnd(N4_constn)/(2*pi*sigma^2);
-        
-        
-        ft2 = [amp2,mole2_loc,sigma,sigma,0];
-        ft3 = [amp3,mole3_loc,sigma,sigma,0];
-        ft4 = [amp4,mole4_loc,sigma,sigma,0];
-        
-        tre_data = CreatGaussianData(ft2,sz)+ CreatGaussianData(ft3,sz) ...
-            + CreatGaussianData(ft4,sz);
-        noise = normrnd(bg_offset,bg_noise,sz);
-        img2(:,:,ii) = tre_data + noise;
-    end
-    
-    
-    for ii = 1:num3
-        amp3 = poissrnd(N3_constn)/(2*pi*sigma^2);
-        amp4 = poissrnd(N4_constn)/(2*pi*sigma^2);
-        
-        ft3 = [amp3,mole3_loc,sigma,sigma,0];
-        ft4 = [amp4,mole4_loc,sigma,sigma,0];
-        
-        dou_data = CreatGaussianData(ft4,sz)+ CreatGaussianData(ft3,sz);
-        noise = normrnd(bg_offset,bg_noise,sz);
-        img3(:,:,ii) = dou_data + noise;
+        img3(:,:,ii) = qua_data+noise;
     end
     
     for ii = 1:num4
-        amp4 = poissrnd(N4_constn)/(2*pi*sigma^2);
-        ft4 = [amp4,mole4_loc,sigma,sigma,0];
-        sin_data = CreatGaussianData(ft4,sz);
+        amp1 = poissrnd(N1_constn)/(2*pi*sigma^2);        
+        amp2 = poissrnd(N2_constn)/(2*pi*sigma^2);
+        amp3 = poissrnd(N3_constn)/(2*pi*sigma^2);
+
+        
+        ft1 = [amp1,mole1_loc,sigma,sigma,0];        
+        ft2 = [amp2,mole2_loc,sigma,sigma,0];
+        ft3 = [amp3,mole3_loc,sigma,sigma,0];
+
+        
+        tre_data = CreatGaussianData(ft1,sz)+ CreatGaussianData(ft2,sz) ...
+            + CreatGaussianData(ft3,sz);
         noise = normrnd(bg_offset,bg_noise,sz);
-        img4(:,:,ii) = sin_data + noise;
+        img4(:,:,ii) = tre_data + noise;
     end
     
+    
     for ii = 1:num5
+        amp1 = poissrnd(N1_constn)/(2*pi*sigma^2);        
+        amp2 = poissrnd(N2_constn)/(2*pi*sigma^2);
+       
+        ft1 = [amp1,mole1_loc,sigma,sigma,0];        
+        ft2 = [amp2,mole2_loc,sigma,sigma,0];
+        
+        dou_data = CreatGaussianData(ft1,sz)+ CreatGaussianData(ft2,sz);
         noise = normrnd(bg_offset,bg_noise,sz);
-        img5(:,:,ii) = noise;
+        img5(:,:,ii) = dou_data + noise;
+    end
+    
+    for ii = 1:num6
+        amp1 = poissrnd(N1_constn)/(2*pi*sigma^2);        
+        ft1 = [amp1,mole1_loc,sigma,sigma,0];        
+        sin_data = CreatGaussianData(ft1,sz);
+        noise = normrnd(bg_offset,bg_noise,sz);
+        img6(:,:,ii) = sin_data + noise;
+    end
+    
+    for ii = 1:num7
+        noise = normrnd(bg_offset,bg_noise,sz);
+        img7(:,:,ii) = noise;
     end
     simu_img(:,:,1:num1) = img1;
     simu_img(:,:,(1:num2)+num1) = img2;
     simu_img(:,:,(1:num3)+num1+num2) = img3;
     simu_img(:,:,(1:num4)+num1+num2+num3) = img4;
     simu_img(:,:,(1:num5)+num1+num2++num3+num4) = img5;
-    
+    simu_img(:,:,(1:num6)+num1+num2++num3+num4+num5) = img6;
+    simu_img(:,:,(1:num7)+num1+num2++num3+num4+num5+num6) = img7;
     % tiffwrite(img1,'SIM_simu1.tif');
     % tiffwrite(img2,'SIM_simu2.tif');
     % tiffwrite(img3,'SIM_simu3.tif');
@@ -107,24 +155,20 @@ for ite = 1:100
     img_set{2} = img2;
     img_set{3} = img3;
     img_set{4} = img4;
-    
+    img_set{5} = img5;
+    img_set{6} = img6;
     [tem_ft,tem_pre] = MultiStepFit(img_set,1,a,display);
     points = tem_ft(:,2:3);
     temp_dis = a*pdist(points);
     sort_dis = sort(temp_dis);
     %diagonal's distance count twice
-    temp_dis([end+1,end+2]) = sort_dis([end-1,end]);
+    %     temp_dis([end+1,end+2]) = sort_dis([end-1,end]);
     tem(ite,:) = temp_dis;
     t  = 1;
     %     ft([2*ite-1,2*ite],:) = tem_ft;
     %     pre([2*ite-1,2*ite],:) = tem_pre;
     
-    %     delta_xy = tem_ft(1,2:3)-tem_ft(2,2:3);
-    %     tem(ite) = a*sqrt(delta_xy*delta_xy');
-    % disp(['delata loc:',num2str(tem)]);
 end
-% mean(tem)
-% std(tem)
 histogram(tem(:));
 
 

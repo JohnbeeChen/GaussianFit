@@ -48,11 +48,32 @@ photon_number = ft.amp*2*pi*(ft.sigma)^2;
 
 pk = pixel_size;
 sd = pk*ft.sigma;
-delta = CalculatePrecision(photon_number,backgraound,pk,sd);
+
 
 %% Output
 fitresult = [ft.amp,ft.x0,ft.y0,ft.sigma,ft.sigma,ft.z0,gof.rsquare];
+
+% estimates background noise
+tem_ft = fitresult;
+tem_ft(6) = 0;
+tem_p = CreatGaussianData(tem_ft,fit_img_size);
+thre = fitresult(1)*exp(-12.5);% 4 sigma principle
+left_img  = fit_img-tem_p;
+idx = tem_p>=thre;
+tem_left_img = left_img(~idx);
+backgraound = std(tem_left_img);
+% figure
+% surf(left_img);
+% tem = left_img;
+% tem(idx) = 0;
+% figure
+% surf(tem);
+% 
+% t = 1;
+
+delta = CalculatePrecision(photon_number,backgraound,pk,sd);
 precision = [photon_number,backgraound,sd,sd,delta,delta];
+% std(left_img(:))
 
 % if (gof.rsquare >= 0.8)&&(gof.rsquare < 0.9)
 %    display_flag = 1;
@@ -77,28 +98,13 @@ if display_flag == 1
 end
 end
 
-%{
-function [centroid,peak] = FindCentroid(img)
 
-mass = sum(img(:));
-x_img = sum(img);
-x_len = length(x_img);
-t = 1:x_len;
-x0 = t*x_img'./mass;
-
-y_img = sum(img,2);
-y_len = length(y_img);
-t = 1:y_len;
-y0 = t*y_img./mass;
-
-x0_int = floor(x0);
-y0_int = floor(y0);
-peak = img(y0_int,x0_int);
-centroid = [x0,y0];
-end
-%}
 function delta = CalculatePrecision(N,b,a,s)
 
-tem = s^2/N + a^2/12/N + 8*pi*s^4*b^2/(a^2*N^2);
-delta = sqrt(tem);
+% tem = s^2/N + a^2/12/N + 8*pi*s^4*b^2/(a^2*N^2);
+sigma_sq = (s^2 + a^2/12)/N;
+tem1 = sigma_sq*(16/9+8*pi*sigma_sq*b^2/(a^2)); 
+sqrt(tem1);
+delta = sqrt(tem1);
+% t = 1;
 end

@@ -13,28 +13,37 @@ display_flag = 1;
 average_flag = 0;
 
 pixel_size = 32.5;%for SIM and TIRF with interpolation
-% pixe_s5ize = 65;%for TIRF without interpolation
+pixel_size = 65;%for TIRF without interpolation
 
 % 1 photon = 0.82 electron, 1 electron = 2.2 intensity
 % gray2photon = 1/(0.82*2.2);
-gray2photon = 1;
+gray2photon = 1/(0.46*0.7);
+% gray2photon = 1;
 if exist('lastpath.mat','file')
     start_path = importdata('lastpath.mat');
 else
     start_path=cd;
 end
 folder_path = uigetdir(start_path);
-all_file_name = findfiles(folder_path,'tif');
+try
+    all_file_name = findfiles(folder_path,'tif');
+catch
+    disp('folder invaild');
+    return;
+end
 for ii = 1:length(all_file_name)
-    file_name = all_file_name{1};
+    file_name = all_file_name{ii};
     img_set = ReadTiff(file_name);
-    img_set = img_set(1:(end-1));
+    img_set{1} = img_set{1}(:,:,(end):end);
+    img_set{2} = img_set{2}(:,:,1:1);
+    %     img_set = img_set(1:(end-1));
     [ft,pre] = MultiStepFit(img_set,gray2photon,pixel_size,display_flag);
+    delta_xy = ft(1,2:3)-ft(2,2:3);
+    tem = pixel_size*sqrt(delta_xy*delta_xy');
+    disp(['delata loc:',num2str(tem)]);
     t = 1;
 end
-delta_xy = ft(1,2:3)-ft(2,2:3);
-tem = pixel_size*sqrt(delta_xy*delta_xy');
-disp(['delata loc:',num2str(tem)]);
+
 
 save('lastpath.mat','folder_path');
 
@@ -57,20 +66,20 @@ while ii>0
         [fitresult(ii,:),precise(ii,:)] = GaussianFit2dCPU(fit_img,pixe_size,dispFlag);
         %         ft = fitresult(ii,:);
         init_flag = 0;
-        figure
-        surf(fit_img);
+        %         figure
+        %         surf(fit_img);
     else
         img_size = size(temp_img(:,:,1));
         for jj = (ii+1):stack_num
             ft = fitresult(jj,:);%gets the fit result of last time fitting
             ft(6) = 0; % set the offset @ft(6) to 0 for creating a perfect Gassian distribution without offset
             p = CreatGaussianData(ft,img_size);
-%             p = CreatePSF(ft,img_size);
+            %             p = CreatePSF(ft,img_size);
             tem = 1*stac_img_num(ii)./stac_img_num(jj);
             fit_img = fit_img - tem*p;
-        end      
-        figure
-        surf(fit_img);
+        end
+        %         figure
+        %         surf(fit_img);
         [fitresult(ii,:),precise(ii,:)] = GaussianFit2dCPU(fit_img,pixe_size,dispFlag);
     end
     ii = ii - 1;
