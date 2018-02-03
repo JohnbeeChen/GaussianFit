@@ -43,7 +43,7 @@ opts.StartPoint = [amp_int 1 x0(1) y0(1) min_value];
 % Fit model to data.
 [ft, gof] = fit([xData, yData], zData, ft, opts);
 
-backgraound = gof.rmse;
+% backgraound = gof.rmse;
 photon_number = ft.amp*2*pi*(ft.sigma)^2;
 
 pk = pixel_size;
@@ -57,10 +57,19 @@ fitresult = [ft.amp,ft.x0,ft.y0,ft.sigma,ft.sigma,ft.z0,gof.rsquare];
 tem_ft = fitresult;
 tem_ft(6) = 0;
 tem_p = CreatGaussianData(tem_ft,fit_img_size);
-thre = fitresult(1)*exp(-12.5);% 4 sigma principle
 left_img  = fit_img-tem_p;
-idx = tem_p>=thre;
-tem_left_img = left_img(~idx);
+
+thre = fitresult(1)*exp(-12.5);% 5 sigma principle
+% thre = fitresult(1)*exp(-8);% 4 sigma principle
+% thre = fitresult(1)*exp(-4.5);% 3 sigma principle
+idx = tem_p>thre;
+if sum(~idx) < sum(fit_img_size)
+    tem_left_img = [left_img(1,:),left_img(end,:)];
+    tem_left_img = [tem_left_img,left_img(2:end-1,1)',left_img(2:end-1,end)'];
+    t = 1;
+else
+    tem_left_img = left_img(~idx);
+end
 backgraound = std(tem_left_img);
 % figure
 % surf(left_img);
@@ -101,10 +110,10 @@ end
 
 function delta = CalculatePrecision(N,b,a,s)
 
-% tem = s^2/N + a^2/12/N + 8*pi*s^4*b^2/(a^2*N^2);
-sigma_sq = (s^2 + a^2/12)/N;
-tem1 = sigma_sq*(16/9+8*pi*sigma_sq*b^2/(a^2)); 
-sqrt(tem1);
-delta = sqrt(tem1);
+tem = s^2/N + a^2/12/N + 8*pi*s^4*b^2/(a^2*N^2);
+% sigma_sq = (s^2 + a^2/12)/N;
+% tem1 = sigma_sq*(16/9+8*pi*sigma_sq*b^2/(a^2)); 
+% sqrt(tem1);
+delta = sqrt(tem);
 % t = 1;
 end

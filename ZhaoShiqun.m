@@ -9,22 +9,29 @@ addpath([cd '/ReadROI']);
 
 %% some parameters can be set
 % @TIRF_falg = 1 means that the input imgaes are from TIRF with interpolation
-TIRF_flag = 0;
+TIRF_flag = 1;
 
 % @displya_flag = 1 for plot the fitting result, 0 for not
 display_flag = 0;
 
 % @pixle_size means the 
-pixle_size = 87;
+% pixle_size = 87;
 % pixle_size = 67; %for Qinghua
+% pixle_size = 32.5;%for SIM and TIRF with interpolation
+pixle_size = 65;%for TIRF without interpolation
+
 % parameters of the camere, sets according to the real device
 ADU = 11.86;
 QE = 0.95;
 EMgain = 2000;
 
 %% the code followed not allow modification
-gray2photon_coefficent = ADU/(QE*EMgain);
+% gray2photon_coefficent = ADU/(QE*EMgain);
 % gray2photon_coefficent = 1/(0.46*0.7);% for Qinghua
+
+
+% 1 photon = 0.82 electron, 1 electron = 2.2 intensity
+gray2photon_coefficent = 1/(0.82*2.2);
 
 %% reads the last time opened file's path
 if exist('lastfile.mat','file')

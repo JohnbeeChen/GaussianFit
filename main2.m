@@ -9,15 +9,16 @@ addpath([cd '/ReadROI']);
 addpath([cd '/Johnbee']);
 
 % @display = 1 means display the fit result, 0 for not
-display_flag = 1;
+display_flag = 0;
 average_flag = 0;
 
 pixel_size = 32.5;%for SIM and TIRF with interpolation
-pixel_size = 65;%for TIRF without interpolation
+% pixel_size = 65;%for TIRF without interpolation
 
 % 1 photon = 0.82 electron, 1 electron = 2.2 intensity
-% gray2photon = 1/(0.82*2.2);
-gray2photon = 1/(0.46*0.7);
+gray2photon = 1/(0.82*2.2);
+% 1 photon = 0.7 electron, 0.46 electron = 1 intensity
+% gray2photon = 0.46/0.7;
 % gray2photon = 1;
 if exist('lastpath.mat','file')
     start_path = importdata('lastpath.mat');
@@ -31,59 +32,31 @@ catch
     disp('folder invaild');
     return;
 end
-for ii = 1:length(all_file_name)
+file_num = length(all_file_name);
+tem(file_num) = 0;
+ft_result{file_num} = [];
+ft_precise{file_num} = [];
+
+for ii = 1:file_num
     file_name = all_file_name{ii};
     img_set = ReadTiff(file_name);
-    img_set{1} = img_set{1}(:,:,(end):end);
-    img_set{2} = img_set{2}(:,:,1:1);
+%     img_set{1} = img_set{1}(:,:,(end-8):(end-2));
+%     img_set{2} = img_set{2}(:,:,2:8);
     %     img_set = img_set(1:(end-1));
     [ft,pre] = MultiStepFit(img_set,gray2photon,pixel_size,display_flag);
     delta_xy = ft(1,2:3)-ft(2,2:3);
-    tem = pixel_size*sqrt(delta_xy*delta_xy');
-    disp(['delata loc:',num2str(tem)]);
+    tem(ii) = pixel_size*sqrt(delta_xy*delta_xy');
+    %     disp(['delata loc:',num2str(tem(ii))]);
+    ft_result{ii} = ft;
+    ft_precise{ii} = pre;
+%     ft_result(end:end+1,:) = ft;
+%     ft_precise(end:end+1,:) = pre;
     t = 1;
 end
-
+ft_result = cell2mat(ft_result');
+ft_precise = cell2mat(ft_precise');
+tem_a(1:2:200,1) = tem;
+tem_a(2:2:200,1) = tem;
 
 save('lastpath.mat','folder_path');
 
-function varargout = MultiStepFit(imgMultiStep,gray2Photon,pixelSize,dispFlag)
-%% this function suit for multi-step image stack
-
-pixe_size = pixelSize;
-stack_num = length(imgMultiStep);
-init_flag = 1;
-fitresult = zeros(stack_num,7);
-precise = zeros(stack_num,6);
-stac_img_num = zeros(stack_num,1);
-ii = stack_num;
-while ii>0
-    temp_img = gray2Photon*imgMultiStep{ii};
-    stac_img_num(ii) = size(temp_img,3);
-    fit_img = sum(temp_img,3);
-    
-    if init_flag %fit the last step witch only have one molecule
-        [fitresult(ii,:),precise(ii,:)] = GaussianFit2dCPU(fit_img,pixe_size,dispFlag);
-        %         ft = fitresult(ii,:);
-        init_flag = 0;
-        %         figure
-        %         surf(fit_img);
-    else
-        img_size = size(temp_img(:,:,1));
-        for jj = (ii+1):stack_num
-            ft = fitresult(jj,:);%gets the fit result of last time fitting
-            ft(6) = 0; % set the offset @ft(6) to 0 for creating a perfect Gassian distribution without offset
-            p = CreatGaussianData(ft,img_size);
-            %             p = CreatePSF(ft,img_size);
-            tem = 1*stac_img_num(ii)./stac_img_num(jj);
-            fit_img = fit_img - tem*p;
-        end
-        %         figure
-        %         surf(fit_img);
-        [fitresult(ii,:),precise(ii,:)] = GaussianFit2dCPU(fit_img,pixe_size,dispFlag);
-    end
-    ii = ii - 1;
-end
-varargout{1} = fitresult;
-varargout{2} = precise;
-end

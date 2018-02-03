@@ -2,7 +2,7 @@ function img_read=imreadstack_TIRF(filename,varargin)
 % read .tif file with Tiff class
 
 warning off;
-t = Tiff(filename, 'r');
+t = Tiff(filename,'r');
 if numel(varargin)==0
     info = imfinfo(filename);
     t.setDirectory(1);
