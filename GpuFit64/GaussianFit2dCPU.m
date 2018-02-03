@@ -45,48 +45,17 @@ opts.StartPoint = [amp_int 1 x0(1) y0(1) min_value];
 
 % backgraound = gof.rmse;
 photon_number = ft.amp*2*pi*(ft.sigma)^2;
+backgraound = BackNoiseEstimate(fit_img);
 
 pk = pixel_size;
 sd = pk*ft.sigma;
 
+delta = CalculatePrecision(photon_number,backgraound,pk,sd);
 
 %% Output
 fitresult = [ft.amp,ft.x0,ft.y0,ft.sigma,ft.sigma,ft.z0,gof.rsquare];
-
-% estimates background noise
-tem_ft = fitresult;
-tem_ft(6) = 0;
-tem_p = CreatGaussianData(tem_ft,fit_img_size);
-left_img  = fit_img-tem_p;
-
-thre = fitresult(1)*exp(-12.5);% 5 sigma principle
-% thre = fitresult(1)*exp(-8);% 4 sigma principle
-% thre = fitresult(1)*exp(-4.5);% 3 sigma principle
-idx = tem_p>thre;
-if sum(~idx) < sum(fit_img_size)
-    tem_left_img = [left_img(1,:),left_img(end,:)];
-    tem_left_img = [tem_left_img,left_img(2:end-1,1)',left_img(2:end-1,end)'];
-    t = 1;
-else
-    tem_left_img = left_img(~idx);
-end
-backgraound = std(tem_left_img);
-% figure
-% surf(left_img);
-% tem = left_img;
-% tem(idx) = 0;
-% figure
-% surf(tem);
-% 
-% t = 1;
-
-delta = CalculatePrecision(photon_number,backgraound,pk,sd);
 precision = [photon_number,backgraound,sd,sd,delta,delta];
-% std(left_img(:))
 
-% if (gof.rsquare >= 0.8)&&(gof.rsquare < 0.9)
-%    display_flag = 1;
-% end
 %% Plot fit with data.
 if display_flag == 1
     figure( 'Name', 'untitled fit 1' );

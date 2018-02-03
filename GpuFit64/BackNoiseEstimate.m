@@ -1,7 +1,8 @@
 function varargout = BackNoiseEstimate(imgNoise)
-% this function is used to estimate the background noise of the input image
+%{ this function is used to estimate the background noise of the input image
 % bg_noise = @(input image)
 % Johnbee<Tianjiu@pku.edu.cn> 2018/02/03
+%}
 
 fft_p = fftshift(fft2(imgNoise));
 mag = abs(fft_p);
@@ -15,9 +16,10 @@ varargout{1} = estimate_bg;
 end
 
 function varargout = KeepHighFreq(fftImag)
-% this funcion is used to set the maximum circle region in the Fourier plane 
+%{ this funcion is used to set the maximum circle region in the Fourier plane 
 % of the @fftImag to 0
 % [fft plane with high frequency, the ratio of maximum cicle] = @(fft_plane)
+%}
 
 sz = size(fftImag);
 min_sz = min(sz);
