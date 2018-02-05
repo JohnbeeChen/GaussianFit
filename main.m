@@ -6,7 +6,7 @@ addpath([cd '/data']);
 addpath([cd '/GpuFit64']);
 addpath([cd '/common']);
 addpath([cd '/ReadROI']);
-
+addpath('Class');
 
 % @display = 1 means display the fit result, 0 for not
 display_flag = 1;

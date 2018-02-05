@@ -6,7 +6,7 @@ addpath([cd '/Johnbee']);
 
 total_photon = 10000;
 pixel_size = 32.5;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-psf_fwhm = 90;% fwhm = 2.355*sigma in Gaussian distribution
+psf_fwhm = 350;% fwhm = 2.355*sigma in Gaussian distribution
 bg_offset = 100; % bg means background
 bg_noise = 50;% @bg_noise means the standard deviation of Gaussian noise
 sigma = psf_fwhm/2.355;

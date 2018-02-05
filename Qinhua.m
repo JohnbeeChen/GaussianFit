@@ -9,7 +9,7 @@ addpath([cd '/ReadROI']);
 addpath([cd '/Johnbee']);
 
 % @display = 1 means display the fit result, 0 for not
-display_flag = 1;
+display_flag = 0;
 average_flag = 0;
 
 % pixel_size = 32.5;%for SIM and TIRF with interpolation

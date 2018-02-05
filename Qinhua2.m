@@ -1,13 +1,11 @@
 clear ft_precise ft_result tem
-display_flag = 1;
+display_flag = 0;
 for ii = 1:len
     tem_sp = Step_point(ii,:);
     tem_roi = roi(tem_sp(5),:);
     tem_stac = roi_stac{ii};
     img_set{1} = tem_stac(:,:,tem_sp(1):tem_sp(2));
     img_set{2} = tem_stac(:,:,tem_sp(3):tem_sp(4));
-%     img_set{1} = img_set{1}(:,:,(end-10):(end-1));
-%     img_set{2} = img_set{2}(:,:,1:10);
     
     img_set = KeepImagstacLength(img_set,20);
     [ft,pre] = MultiStepFit(img_set,gray2photon,pixel_size,display_flag);
@@ -20,7 +18,8 @@ end
 ft_result = cell2mat(ft_result');
 ft_precise = cell2mat(ft_precise');
 tem = tem';
-% tem(4) = [];
+tem_a(1:2:2*len,1) = tem;
+tem_a(2:2:2*len,1) = tem;
 figure
 histogram(tem);
 mean(tem)
