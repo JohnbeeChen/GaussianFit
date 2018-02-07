@@ -31,6 +31,6 @@ len = size(Step_point,1);
 roi = ROI_set{1};
 roi_stac = ROI_Cutor(Tiff_file,roi);
 
-run Qinhua2.m;
+% run Qinhua2.m;
 
 

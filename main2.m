@@ -55,8 +55,16 @@ for ii = 1:file_num
 end
 ft_result = cell2mat(ft_result');
 ft_precise = cell2mat(ft_precise');
-tem_a(1:2:200,1) = tem;
-tem_a(2:2:200,1) = tem;
+tem_a(1:2:2*ii,1) = tem;
+tem_a(2:2:2*ii,1) = tem;
 
+%% saves data to execel
+str_idx = strfind(folder_path,'\');
+tem = folder_path(str_idx(end):end);
+execel_name = [tem,'.xlsx'];
+savedata = [ft_result,ft_precise,tem_a];
+columname = {'amp','xc','yc','sigma x','sigma y','z0','Rsquare','Photon',...
+             'bg noise','width x','width y','delta x','delta y','distance'};
+SaveExcel([folder_path,execel_name],savedata,columname);
 save('lastpath.mat','folder_path');
 

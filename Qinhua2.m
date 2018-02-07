@@ -24,8 +24,16 @@ figure
 histogram(tem);
 mean(tem)
 
-function varargout = KeepImagstacLength(imgStack,myLen)
+%% saves data to execel
+tiff_filename = Tiff_path{1};
+execel_name = replace(tiff_filename,'.tif','.xlsx');
+savedata = [ft_result,ft_precise,tem_a];
+columname = {'amp','xc','yc','sigma x','sigma y','z0','Rsquare','Photon',...
+             'bg noise','width x','width y','delta x','delta y','distance'};
+SaveExcel(execel_name,savedata,columname);
 
+%%
+function varargout = KeepImagstacLength(imgStack,myLen)
 if myLen < 1
     varargout{1} = [];
     return
