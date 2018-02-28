@@ -1,5 +1,8 @@
 classdef GauFitting < handle
     %{
+        GauFitting class is used to single molecular Gaussian fitting
+        Version: 1.0 <2018/02/28>
+        Author:  Johnbee<Tianjiu@pku.edu.cn>
     %}
     properties
         PixelSize
@@ -7,6 +10,7 @@ classdef GauFitting < handle
     end
     methods
         function obj = GauFitting(varargin)
+            % new a GauFitting object, obj = @(pixelSize,gray2Photon);
             validScalarPosNum = @(x) isnumeric(x) && isscalar(x) && (x > 0);
             ip = inputParser;
             ip.addOptional('pixelSize',1,validScalarPosNum);
@@ -14,7 +18,7 @@ classdef GauFitting < handle
             ip.parse(varargin{:});
             obj.PixelSize = ip.Results.pixelSize;
             obj.Gray2Photon = ip.Results.gray2Photon;
-        end        
+        end
         function [fitresult,precision] = GaussianFit2dCPU(obj,fit_img,varargin)
             %{
             GaussianFit2dCPU(fit_img)
@@ -24,6 +28,7 @@ classdef GauFitting < handle
                 fitresult = [amp,centroid_x0,centroid_y0,(standar deviation x, y),z0,rsquar];
                 precision = [phton_number, background noise, pixle_size*(sd_x,sd_y),(precision_x,y)];
             %}
+            ip = inputParser;
             ip.addParameter('DisplayFlag','off');
             ip.addParameter('Title','');
             ip.parse(varargin{:});
@@ -113,7 +118,7 @@ classdef GauFitting < handle
             end
             varargout{1} = fitresult(end:-1:1,:);
             varargout{2} = precise(end:-1:1,:);
-        end        
+        end
     end
     methods (Access = private)
         
@@ -140,11 +145,10 @@ classdef GauFitting < handle
             varargout{1} = p;
         end
         function varargout = BackNoiseEstimate(imgNoise)
-            %{ this function is used to estimate the background noise of the input image
+            % this function is used to estimate the background noise of the input image
             % bg_noise = @(input image)
             % Johnbee<Tianjiu@pku.edu.cn> 2018/02/03
-            %}
-            
+            %
             fft_p = fftshift(fft2(imgNoise));
             mag = abs(fft_p);
             [fft_high,fraction] = GauFitting.KeepHighFreq(mag);
@@ -155,11 +159,10 @@ classdef GauFitting < handle
             varargout{1} = estimate_bg;
             
         end
-        
         function varargout = KeepHighFreq(fftImag)
             %this funcion is used to set the maximum circle region in the Fourier plane
             % of the @fftImag to 0
-            % [fft plane with high frequency, the ratio of maximum cicle] = @(fft_plane)            
+            % [fft plane with high frequency, the ratio of maximum cicle] = @(fft_plane)
             sz = size(fftImag);
             min_sz = min(sz);
             radius = max(min_sz)/2;

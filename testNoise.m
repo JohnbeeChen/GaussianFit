@@ -7,7 +7,7 @@ addpath([cd '/Johnbee']);
 total_photon = 10000;
 pixel_size = 32.5;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 psf_fwhm = 350;% fwhm = 2.355*sigma in Gaussian distribution
-bg_offset = 1; % bg means background
+bg_offset = 10; % bg means background
 bg_noise = 10;% @bg_noise means the standard deviation of Gaussian noise
 sigma = psf_fwhm/2.355;
 sd = sigma/pixel_size;
@@ -27,18 +27,21 @@ amp = total_photon./(2*pi*sd.^2);
 ft = [amp,x0,y0,sdx,sdy,z0];
 p = CreatGaussianData(ft,img_size); 
 noise = normrnd(bg_offset,bg_noise,img_size);
-for ii = 1:8
-    bg_noise = bg_noise+5*ii;
-    noise = noise + normrnd(bg_offset,bg_noise,img_size);
-    total_photon = poissrnd(total_photon);%simultates the poisson noise
-    amp = total_photon./(2*pi*sd.^2);
-    p = p+CreatGaussianData(ft,img_size); 
-end
-p = p+noise;
+% for ii = 1:8
+%     bg_noise = bg_noise+5*ii;
+%     noise = noise + normrnd(bg_offset,bg_noise,img_size);
+%     total_photon = poissrnd(total_photon);%simultates the poisson noise
+%     amp = total_photon./(2*pi*sd.^2);
+%     p = p+CreatGaussianData(ft,img_size); 
+% end
+% p = p+noise;
+
+p = p + noise;% simulates the Gaussian noise
 std = std(noise(:))
 est = GauFitting.BackNoiseEstimate(p)
-% p = p + noise;% simulates the Gaussian noise
-% [ftre,frpre] = GaussianFit2dCPU(noise,pixel_size,display_flag);
+% surf(p);
+% [ftre,frpre] = GaussianFit2dCPU(p,pixel_size,display_flag);
 
+MyFit = GauFitting(pixel_size,1);
 
-
+[ftre,frpre] = MyFit.GaussianFit2dCPU(p,'DisplayFlag','on');
